@@ -11,6 +11,7 @@
       }
     </style>
     <script type="text/javascript" src="./js/snake.js"></script>
+    <script type="text/javascript" src="./js/blocks.js"></script>
   </head>
   <body>
  
@@ -21,10 +22,14 @@
       const canvasObj = document.getElementById("canvas");
       let ctx = canvasObj.getContext("2d");
 
-      window.addEventListener("mousemove", moveSnake, true);
+      canvasObj.addEventListener("mousemove", moveSnake, true);
       draw = function () {
         ctx.clearRect(0, 0, canvasObj.width, canvasObj.height);
+        showBlock();
         showSnake();
+
+
+        moveBlock();
         requestAnimationFrame(draw)
       }
 
