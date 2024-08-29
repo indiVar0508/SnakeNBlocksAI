@@ -1,3 +1,5 @@
+const DROP_SPEED = 5;
+
 class Rectange {
   constructor(x, y, width, height, color) {
     this.x = x;
@@ -19,7 +21,7 @@ class Rectange {
 class Hurdle extends Rectange {
   constructor(x, y, width, height, color, number) {
     super(x, y, width, height, color);
-    this.dropSpeed = 5;
+    this.dropSpeed = DROP_SPEED;
     this.number = number;
   }
 
@@ -97,22 +99,91 @@ class HurdleBlocks {
     });
   }
 
+  isHurdleOutsideWindow() {
+    return this.hurdles[0].y > canvasObj.height;
+  }
+
   drop() {
     this.hurdles.forEach((hurdle) => {
       hurdle.drop();
     });
-    if (this.hurdles[0].y > canvasObj.height) {
-      this.resetHurdles();
+  }
+}
+
+class PipeBlocks {
+  constructor() {
+    this.pipes = [];
+    this.dropSpeed = DROP_SPEED;
+    this.possibleXCord = [];
+    for (var i = 1; i < 5; i++) {
+      this.possibleXCord.push((i * WINDOW_SIZE) / 5);
     }
+  }
+
+  addPipe() {
+    // If more than 8 pipes its already noisy stop
+    if (this.pipes.length > 8) return;
+    // 50% chance you ask for a pipe and you get a pipe
+    if (Math.random() > 0.5) return;
+
+    this.pipes.push(
+      new Rectange(
+        this.possibleXCord[
+          Math.floor(Math.random() * this.possibleXCord.length)
+        ],
+        -500, // FIXME: don't hardcode
+        10,
+        (Math.floor(Math.random() * 5) + 1) * 100,
+        "rgb(0,0,0)"
+      )
+    );
+  }
+
+  drop() {
+    this.pipes.forEach((pipe) => {
+      pipe.y += this.dropSpeed;
+    });
+  }
+
+  removePipesOutsideWindow() {
+    for (var i = 0; i < this.pipes.length; i++) {
+      if (this.pipes[i].y > canvasObj.height) {
+        // pipe is outside window, need to get rid of it
+        this.pipes.splice(i, 1);
+        // adjust the pointer
+        i--;
+      }
+    }
+  }
+
+  draw() {
+    this.pipes.forEach((pipe) => {
+      pipe.draw();
+    });
   }
 }
 
 hurdleBlockObj = new HurdleBlocks();
+pipesBlockObj = new PipeBlocks();
+
+function handleOutofWindow() {
+  if (hurdleBlockObj.isHurdleOutsideWindow()) {
+    // If hurdle has gone outside the window then just reset it.
+    hurdleBlockObj.resetHurdles();
+    for (var i = 0; i < Math.floor(Math.random() * 10); i++) {
+      pipesBlockObj.addPipe();
+    }
+  }
+  pipesBlockObj.removePipesOutsideWindow();
+}
 
 function showBlock() {
+  pipesBlockObj.draw();
   hurdleBlockObj.draw();
 }
 
 function moveBlock() {
   hurdleBlockObj.drop();
+  pipesBlockObj.drop();
+  handleOutofWindow();
 }
