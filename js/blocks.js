@@ -115,7 +115,7 @@ class PipeBlocks {
     this.dropSpeed = DROP_SPEED;
     this.possibleXCord = [];
     for (var i = 1; i < 5; i++) {
-      this.possibleXCord.push((i * WINDOW_SIZE) / 5);
+      this.possibleXCord.push((i * WINDOW_SIZE) / 5 - 5);
     }
   }
 
@@ -233,9 +233,9 @@ function handleOutofWindow() {
 }
 
 function showBlock() {
+  randomHurdleObj.draw();
   pipesBlockObj.draw();
   hurdleBlockObj.draw();
-  randomHurdleObj.draw();
 }
 
 function moveBlock() {
