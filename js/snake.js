@@ -36,7 +36,7 @@ class Circle {
 class Snake {
   constructor(size = 4) {
     this.size = size;
-    this.startPoint = 400;
+    this.startPoint = 450;
     this.circleRadius = 10;
     this.isAlive = true;
     this.snakeCircles = [];
