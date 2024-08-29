@@ -42,19 +42,18 @@ class HurdleBlocks {
   constructor() {
     this.hurdles = [];
     for (var i = 0; i < 5; i++) {
-      this.hurdles.push(
-        new Hurdle(
-          (i * WINDOW_SIZE) / 5,
-          -100,
-          WINDOW_SIZE / 5,
-          WINDOW_SIZE / 5,
-          // # FIXME: comback for better way to color the blocks
-          `rgb(0, 0, 0)`,
-          -1
-        )
+      this.addHurdle(
+        (i * WINDOW_SIZE) / 5,
+        -(WINDOW_SIZE / 5),
+        WINDOW_SIZE / 5,
+        WINDOW_SIZE / 5
       );
     }
     this.resetHurdles();
+  }
+
+  addHurdle(x, y, width, height, color = "rgb(0, 0, 0)", number = -1) {
+    this.hurdles.push(new Hurdle(x, y, width, height, color, number));
   }
 
   resetHurdles() {
@@ -85,7 +84,7 @@ class HurdleBlocks {
       }
       this.hurdles[i].color = `rgb(${this.scaleNumberToColor(number)}, 0, 0)`;
       this.hurdles[i].number = number;
-      this.hurdles[i].y = -100;
+      this.hurdles[i].y = -(WINDOW_SIZE / 5);
     }
   }
 
@@ -131,7 +130,7 @@ class PipeBlocks {
         this.possibleXCord[
           Math.floor(Math.random() * this.possibleXCord.length)
         ],
-        -500, // FIXME: don't hardcode
+        -500 - (Math.floor(Math.random() * 5) + 1) * 100, // FIXME: don't hardcode
         10,
         (Math.floor(Math.random() * 5) + 1) * 100,
         "rgb(0,0,0)"
@@ -163,8 +162,47 @@ class PipeBlocks {
   }
 }
 
+class RandomHurdle extends HurdleBlocks {
+  constructor() {
+    super();
+    // we reset items from super
+    this.hurdles = [];
+    this.dropSpeed = 5;
+  }
+
+  addRandomBlocks() {
+    // No more than 5 random hurdle at a time
+    if (this.hurdles.length > 5) return;
+    // 30% change of being created
+    if (Math.random() > 0.3) return;
+    let number =
+      Math.floor(Math.random() * snake.snakeCircles.length * 5) +
+      (snake.snakeCircles.length - 2);
+    this.addHurdle(
+      // Random X cordinate
+      (Math.floor(Math.random() * 5) * WINDOW_SIZE) / 5,
+      // Random Y cordinate
+      -(WINDOW_SIZE / 5) * (Math.floor(Math.random() * 5) + 1),
+      WINDOW_SIZE / 5,
+      WINDOW_SIZE / 5,
+      `rgb(${this.scaleNumberToColor(number)}, 0, 0)`,
+      number
+    );
+  }
+
+  removeBlocksOutsideWindow() {
+    for (var i = 0; i < this.hurdles.length; i++) {
+      if (this.hurdles[i].y > canvasObj.height) {
+        this.hurdles.splice(i, 1);
+        i--;
+      }
+    }
+  }
+}
+
 hurdleBlockObj = new HurdleBlocks();
 pipesBlockObj = new PipeBlocks();
+randomHurdleObj = new RandomHurdle();
 
 function handleOutofWindow() {
   if (hurdleBlockObj.isHurdleOutsideWindow()) {
@@ -173,17 +211,36 @@ function handleOutofWindow() {
     for (var i = 0; i < Math.floor(Math.random() * 10); i++) {
       pipesBlockObj.addPipe();
     }
+    for (var i = 0; i < Math.floor(Math.random() * 10); i++) {
+      randomHurdleObj.addRandomBlocks();
+    }
+    // Remove blocks overlapping main hurdle block
+    hurdleBlockObj.hurdles.forEach((mainHurdle) => {
+      for (var i = 0; i < randomHurdleObj.hurdles.length; i++) {
+        if (
+          // Y co-ordinate and x coordinate match at time of creation which means there is overlap
+          mainHurdle.y - randomHurdleObj.hurdles[i].y == 0 &&
+          mainHurdle.x - randomHurdleObj.hurdles[i].x == 0
+          // FIXME: need to look into vertically aligned ones as well
+        ) {
+          randomHurdleObj.hurdles.splice(i, 1);
+        }
+      }
+    });
   }
   pipesBlockObj.removePipesOutsideWindow();
+  randomHurdleObj.removeBlocksOutsideWindow();
 }
 
 function showBlock() {
   pipesBlockObj.draw();
   hurdleBlockObj.draw();
+  randomHurdleObj.draw();
 }
 
 function moveBlock() {
   hurdleBlockObj.drop();
   pipesBlockObj.drop();
+  randomHurdleObj.drop();
   handleOutofWindow();
 }
