@@ -200,47 +200,61 @@ class RandomHurdle extends HurdleBlocks {
   }
 }
 
-hurdleBlockObj = new HurdleBlocks();
-pipesBlockObj = new PipeBlocks();
-randomHurdleObj = new RandomHurdle();
-
-function handleOutofWindow() {
-  if (hurdleBlockObj.isHurdleOutsideWindow()) {
-    // If hurdle has gone outside the window then just reset it.
-    hurdleBlockObj.resetHurdles();
-    for (var i = 0; i < Math.floor(Math.random() * 10); i++) {
-      pipesBlockObj.addPipe();
-    }
-    for (var i = 0; i < Math.floor(Math.random() * 10); i++) {
-      randomHurdleObj.addRandomBlocks();
-    }
-    // Remove blocks overlapping main hurdle block
-    hurdleBlockObj.hurdles.forEach((mainHurdle) => {
-      for (var i = 0; i < randomHurdleObj.hurdles.length; i++) {
-        if (
-          // Y co-ordinate and x coordinate match at time of creation which means there is overlap
-          mainHurdle.y - randomHurdleObj.hurdles[i].y == 0 &&
-          mainHurdle.x - randomHurdleObj.hurdles[i].x == 0
-          // FIXME: need to look into vertically aligned ones as well
-        ) {
-          randomHurdleObj.hurdles.splice(i, 1);
-        }
-      }
-    });
+class Blocks {
+  constructor() {
+    this.hurdleBlockObj = new HurdleBlocks();
+    this.pipesBlockObj = new PipeBlocks();
+    this.randomHurdleObj = new RandomHurdle();
   }
-  pipesBlockObj.removePipesOutsideWindow();
-  randomHurdleObj.removeBlocksOutsideWindow();
+
+  handleOutofWindow() {
+    if (this.hurdleBlockObj.isHurdleOutsideWindow()) {
+      // If hurdle has gone outside the window then just reset it.
+      this.hurdleBlockObj.resetHurdles();
+      for (var i = 0; i < Math.floor(Math.random() * 10); i++) {
+        this.pipesBlockObj.addPipe();
+      }
+      for (var i = 0; i < Math.floor(Math.random() * 10); i++) {
+        this.randomHurdleObj.addRandomBlocks();
+      }
+      // Remove blocks overlapping main hurdle block
+      this.hurdleBlockObj.hurdles.forEach((mainHurdle) => {
+        for (var i = 0; i < this.randomHurdleObj.hurdles.length; i++) {
+          if (
+            // Y co-ordinate and x coordinate match at time of creation which means there is overlap
+            mainHurdle.y - this.randomHurdleObj.hurdles[i].y == 0 &&
+            mainHurdle.x - this.randomHurdleObj.hurdles[i].x == 0
+            // FIXME: need to look into vertically aligned ones as well
+          ) {
+            this.randomHurdleObj.hurdles.splice(i, 1);
+          }
+        }
+      });
+    }
+    this.pipesBlockObj.removePipesOutsideWindow();
+    this.randomHurdleObj.removeBlocksOutsideWindow();
+  }
+
+  draw() {
+    this.randomHurdleObj.draw();
+    this.pipesBlockObj.draw();
+    this.hurdleBlockObj.draw();
+  }
+
+  drop() {
+    this.hurdleBlockObj.drop();
+    this.pipesBlockObj.drop();
+    this.randomHurdleObj.drop();
+  }
 }
 
+blocks = new Blocks();
+
 function showBlock() {
-  randomHurdleObj.draw();
-  pipesBlockObj.draw();
-  hurdleBlockObj.draw();
+  blocks.draw();
 }
 
 function moveBlock() {
-  hurdleBlockObj.drop();
-  pipesBlockObj.drop();
-  randomHurdleObj.drop();
-  handleOutofWindow();
+  blocks.drop();
+  blocks.handleOutofWindow();
 }
