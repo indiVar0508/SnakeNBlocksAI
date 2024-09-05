@@ -91,17 +91,12 @@ class HurdleBlocks {
       );
     }
     let numbers = [
-      // Intentionally add most of the length to ensure not having multiple solutions
-      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
-        (snakeObj.snakeCircles.length - 2),
-      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
-        (snakeObj.snakeCircles.length - 2),
-      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
-        (snakeObj.snakeCircles.length - 2),
-      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
-        (snakeObj.snakeCircles.length - 2),
-      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
-        (snakeObj.snakeCircles.length - 2),
+      // FIXME: need better logic to generate numbers
+      Math.max(Math.floor(Math.random() * snakeObj.snakeCircles.length * 5), 1),
+      Math.max(Math.floor(Math.random() * snakeObj.snakeCircles.length * 5), 1),
+      Math.max(Math.floor(Math.random() * snakeObj.snakeCircles.length * 5), 1),
+      Math.max(Math.floor(Math.random() * snakeObj.snakeCircles.length * 5), 1),
+      Math.max(Math.floor(Math.random() * snakeObj.snakeCircles.length * 5), 1),
     ];
     let randomSolvableIdx = Math.floor(Math.random() * 5);
     let number;
@@ -109,16 +104,38 @@ class HurdleBlocks {
       if (i == randomSolvableIdx) {
         // For solution block get a value less than snake length
         number = Math.max(
-          0,
+          1,
           Math.floor(Math.random() * snakeObj.snakeCircles.length - 1)
         );
+        numbers[i] = number;
       } else {
         number = numbers[i];
       }
-      this.hurdles[i].color = `rgb(${this.scaleNumberToColor(number)}, 0, 0)`;
+      this.hurdles[i].color = `rgb(0, 0, 0)`;
       this.hurdles[i].number = number;
       this.hurdles[i].y = -(WINDOW_SIZE / 5);
     }
+    const normalizedValues = this.normalizeArray(numbers);
+    const colors = normalizedValues.map(this.valueToColor);
+    for (var i = 0; i < 5; i++) {
+      this.hurdles[i].color = colors[i];
+    }
+  }
+
+  // ChatGPT Bawa __/\__
+  valueToColor(normalizedValue) {
+    // Map normalized value to a color scale, here we use a gradient from blue to red
+    const r = Math.floor(255 * normalizedValue); // Red channel
+    const g = Math.floor(255 * (1 - normalizedValue)); // green channel
+    const b = 0; // blue channel remains 0 for simplicity
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  // ChatGPT Bawa __/\__
+  normalizeArray(arr) {
+    const min = Math.min(...arr);
+    const max = Math.max(...arr);
+    return arr.map((value) => (value - min) / (max - min));
   }
 
   scaleNumberToColor(num) {
