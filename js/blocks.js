@@ -1,4 +1,10 @@
 const DROP_SPEED = 5;
+const COLLISION_TYPE = Object.freeze({
+  BOTTOM: 0,
+  LEFT: 1,
+  RIGHT: 2,
+  NO_COLLISION: -1,
+});
 
 class Rectange {
   constructor(x, y, width, height, color) {
@@ -15,6 +21,33 @@ class Rectange {
     ctx.roundRect(this.x, this.y, this.width, this.height, 10);
     ctx.closePath();
     ctx.fill();
+  }
+  // some kind of friend function of circle!?:/
+  collisionWithCircle(circle) {
+    let snakeLeftBound = circle.x - circle.radius;
+    let snakeRightBound = circle.x + circle.radius;
+
+    if (circle.y >= this.y && circle.y <= this.y + this.height) {
+      if (
+        snakeLeftBound >= this.x &&
+        snakeLeftBound <= this.x + this.width &&
+        snakeRightBound >= this.x &&
+        snakeRightBound <= this.x + this.width
+      ) {
+        return COLLISION_TYPE.BOTTOM;
+      } else if (
+        snakeLeftBound >= this.x &&
+        snakeLeftBound <= this.x + this.width
+      ) {
+        return COLLISION_TYPE.LEFT;
+      } else if (
+        snakeRightBound >= this.x &&
+        snakeRightBound <= this.x + this.width
+      ) {
+        return COLLISION_TYPE.RIGHT;
+      }
+    }
+    return -1;
   }
 }
 
@@ -40,6 +73,14 @@ class Hurdle extends Rectange {
 
 class HurdleBlocks {
   constructor() {
+    this.resetHurdles();
+  }
+
+  addHurdle(x, y, width, height, color = "rgb(0, 0, 0)", number = -1) {
+    this.hurdles.push(new Hurdle(x, y, width, height, color, number));
+  }
+
+  resetHurdles() {
     this.hurdles = [];
     for (var i = 0; i < 5; i++) {
       this.addHurdle(
@@ -49,14 +90,6 @@ class HurdleBlocks {
         WINDOW_SIZE / 5
       );
     }
-    this.resetHurdles();
-  }
-
-  addHurdle(x, y, width, height, color = "rgb(0, 0, 0)", number = -1) {
-    this.hurdles.push(new Hurdle(x, y, width, height, color, number));
-  }
-
-  resetHurdles() {
     let numbers = [
       // Intentionally add most of the length to ensure not having multiple solutions
       Math.floor(Math.random() * snake.snakeCircles.length * 5) +
@@ -121,9 +154,9 @@ class PipeBlocks {
 
   addPipe() {
     // If more than 8 pipes its already noisy stop
-    if (this.pipes.length > 8) return;
+    if (this.pipes.length > 3) return;
     // 50% chance you ask for a pipe and you get a pipe
-    if (Math.random() > 0.5) return;
+    if (Math.random() > 0.4) return;
 
     this.pipes.push(
       new Rectange(
@@ -246,6 +279,104 @@ class Blocks {
     this.pipesBlockObj.drop();
     this.randomHurdleObj.drop();
   }
+
+  freeze() {
+    // Hurdle Block
+    this.hurdleBlockObj.hurdles.forEach((block) => {
+      block.dropSpeed *= -1;
+      block.drop();
+      block.dropSpeed *= -1;
+    });
+    this.randomHurdleObj.hurdles.forEach((block) => {
+      block.dropSpeed *= -1;
+      block.drop();
+      block.dropSpeed *= -1;
+    });
+
+    this.pipesBlockObj.dropSpeed *= -1;
+    this.pipesBlockObj.drop();
+    this.pipesBlockObj.dropSpeed *= -1;
+  }
+
+  collision(snake) {
+    // Deal only with snake head
+    let snakeHead = snake.snakeCircles[0];
+    // Pipecollision handling
+    this.pipesBlockObj.pipes.forEach((pipe) => {
+      let collision = pipe.collisionWithCircle(snakeHead);
+      if (collision === COLLISION_TYPE.NO_COLLISION) {
+        return;
+      }
+      if (collision === COLLISION_TYPE.LEFT) {
+        // Handle Left direction
+        snake.snakeCircles[0].x = pipe.x + pipe.width + snakeHead.radius;
+      } else if (collision === COLLISION_TYPE.RIGHT) {
+        // Handle Right direction
+        snake.snakeCircles[0].x = pipe.x - snakeHead.radius;
+      } else if (collision === COLLISION_TYPE.BOTTOM) {
+        // push to left!?!
+        // FIXME: so this does not work :(
+        snake.snakeCircles[0].x = pipe.x - snakeHead.radius;
+      }
+    });
+    // restrict snake when it hits number block
+    // based on number on block, block also stops falling
+    // everything stops falling
+    // 3 scenerios!?
+    // if snake hits bottom somethings happen
+    //  - all blocks & snake are frozen
+    //  - number decreases in block collinding
+    //  - ??
+    // if snake hits sidewise it gets restrickted
+
+    // Handle random block collision
+    for (var i = 0; i < this.randomHurdleObj.hurdles.length; i++) {
+      let hurdle = this.randomHurdleObj.hurdles[i];
+      let collision = hurdle.collisionWithCircle(snakeHead);
+      if (collision === COLLISION_TYPE.LEFT) {
+        // Handle Left direction
+        snake.snakeCircles[0].x = hurdle.x + hurdle.width + snakeHead.radius;
+      } else if (collision === COLLISION_TYPE.RIGHT) {
+        // Handle Right direction
+        snake.snakeCircles[0].x = hurdle.x - snakeHead.radius;
+      } else if (collision === COLLISION_TYPE.BOTTOM) {
+        // freeze everything in screen
+        this.freeze();
+        // reduce snake size
+        // snake.snakeCircles.shift(1);
+        // reduce block number
+        hurdle.number -= 1;
+        if (hurdle.number < 0) {
+          // Remove the hurdle
+          this.randomHurdleObj.hurdles.splice(i, 1);
+        }
+      }
+    }
+
+    // handle main block
+    for (var i = 0; i < this.hurdleBlockObj.hurdles.length; i++) {
+      let hurdle = this.hurdleBlockObj.hurdles[i];
+      let collision = hurdle.collisionWithCircle(snakeHead);
+      if (collision === COLLISION_TYPE.LEFT) {
+        // Handle Left direction
+        snake.snakeCircles[0].x = hurdle.x + hurdle.width + snakeHead.radius;
+      } else if (collision === COLLISION_TYPE.RIGHT) {
+        // Handle Right direction
+        snake.snakeCircles[0].x = hurdle.x - snakeHead.radius;
+      } else if (collision === COLLISION_TYPE.BOTTOM) {
+        // freeze everything in screen
+        this.freeze();
+        // reduce snake size
+        // snake.snakeCircles.shift(1);
+        // reduce block number
+        hurdle.number -= 1;
+        if (hurdle.number < 1) {
+          // Remove the hurdle
+          this.hurdleBlockObj.hurdles.splice(i, 1);
+        }
+      }
+    }
+  }
 }
 
 blocks = new Blocks();
@@ -257,4 +388,8 @@ function showBlock() {
 function moveBlock() {
   blocks.drop();
   blocks.handleOutofWindow();
+}
+
+function handleCollision(snake) {
+  blocks.collision(snake);
 }

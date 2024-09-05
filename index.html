@@ -31,10 +31,11 @@
 
 
         moveBlock();
-        requestAnimationFrame(draw)
+        handleCollision(snake);
+        requestAnimationFrame(draw);
       }
 
-      draw()
+      draw();
     </script>
   </body>
 </html>
