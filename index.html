@@ -36,6 +36,7 @@
         // Is Game still on!?
         if (!snakeObj.isAlive()) {
           snakeObj = new Snake();
+          snakeBoostersObj.resetFood();
           blocks.reset();
         }
         // something related to canvas

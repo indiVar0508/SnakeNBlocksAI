@@ -6,6 +6,27 @@ const COLLISION_TYPE = Object.freeze({
   NO_COLLISION: -1,
 });
 
+let possibleXCord = [];
+for (var i = 1; i < 5; i++) {
+  possibleXCord.push((i * WINDOW_SIZE) / 5 - 5);
+}
+
+// ChatGPT Bawa __/\__
+function valueToColor(normalizedValue) {
+  // Map normalized value to a color scale, here we use a gradient from blue to red
+  const r = Math.floor(255 * normalizedValue); // Red channel
+  const g = Math.floor(255 * (1 - normalizedValue)); // green channel
+  const b = 0; // blue channel remains 0 for simplicity
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+// ChatGPT Bawa __/\__
+function normalizeArray(arr) {
+  const min = Math.min(...arr);
+  const max = Math.max(...arr);
+  return arr.map((value) => (value - min) / (max - min));
+}
+
 class Rectange {
   constructor(x, y, width, height, color) {
     this.x = x;
@@ -115,27 +136,11 @@ class HurdleBlocks {
       this.hurdles[i].number = number;
       this.hurdles[i].y = -(WINDOW_SIZE / 5);
     }
-    const normalizedValues = this.normalizeArray(numbers);
-    const colors = normalizedValues.map(this.valueToColor);
+    const normalizedValues = normalizeArray(numbers);
+    const colors = normalizedValues.map(valueToColor);
     for (var i = 0; i < 5; i++) {
       this.hurdles[i].color = colors[i];
     }
-  }
-
-  // ChatGPT Bawa __/\__
-  valueToColor(normalizedValue) {
-    // Map normalized value to a color scale, here we use a gradient from blue to red
-    const r = Math.floor(255 * normalizedValue); // Red channel
-    const g = Math.floor(255 * (1 - normalizedValue)); // green channel
-    const b = 0; // blue channel remains 0 for simplicity
-    return `rgb(${r}, ${g}, ${b})`;
-  }
-
-  // ChatGPT Bawa __/\__
-  normalizeArray(arr) {
-    const min = Math.min(...arr);
-    const max = Math.max(...arr);
-    return arr.map((value) => (value - min) / (max - min));
   }
 
   scaleNumberToColor(num) {
@@ -163,10 +168,6 @@ class PipeBlocks {
   constructor() {
     this.pipes = [];
     this.dropSpeed = DROP_SPEED;
-    this.possibleXCord = [];
-    for (var i = 1; i < 5; i++) {
-      this.possibleXCord.push((i * WINDOW_SIZE) / 5 - 5);
-    }
   }
 
   addPipe() {
@@ -177,9 +178,7 @@ class PipeBlocks {
 
     this.pipes.push(
       new Rectange(
-        this.possibleXCord[
-          Math.floor(Math.random() * this.possibleXCord.length)
-        ],
+        possibleXCord[Math.floor(Math.random() * possibleXCord.length)],
         -500 - (Math.floor(Math.random() * 5) + 1) * 100, // FIXME: don't hardcode
         10,
         (Math.floor(Math.random() * 5) + 1) * 100,
@@ -247,6 +246,112 @@ class RandomHurdle extends HurdleBlocks {
         i--;
       }
     }
+  }
+}
+
+class SnakeFood extends Rectange {
+  constructor(x, y, width, height, color, number) {
+    super(x, y, width, height, color);
+    this.number = number;
+    this.dropSpeed = DROP_SPEED;
+  }
+
+  drop() {
+    this.y += this.dropSpeed;
+    if (this.y > canvasObj.height) {
+      // reset food location
+      this.reset();
+    }
+  }
+
+  reset() {
+    let numbers = [
+      Math.max(1, Math.floor(Math.random() * snakeObj.snakeCircles.length)),
+      Math.max(
+        1,
+        Math.floor(
+          Math.random() * snakeObj.snakeCircles.length +
+            Math.floor(Math.random() * 10)
+        )
+      ),
+      Math.max(
+        1,
+        Math.floor(
+          Math.random() * snakeObj.snakeCircles.length +
+            Math.floor(Math.random() * 20)
+        )
+      ),
+      Math.max(
+        1,
+        Math.floor(
+          Math.random() * snakeObj.snakeCircles.length +
+            Math.floor(Math.random() * 5)
+        )
+      ),
+      Math.max(
+        1,
+        Math.floor(
+          Math.random() * snakeObj.snakeCircles.length +
+            Math.floor(Math.random() * 4)
+        )
+      ),
+    ];
+    this.x = possibleXCord[Math.floor(Math.random() * possibleXCord.length)];
+    this.y = -5 * (Math.floor(Math.random() * 5) + 1) * 100;
+    this.number = numbers[Math.floor(Math.random() * numbers.length)];
+  }
+
+  draw() {
+    ctx.fillStyle = "blue";
+    ctx.beginPath();
+    ctx.roundRect(this.x, this.y, this.width, this.height, this.width / 2 + 3);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "black";
+    ctx.font = "20px serif";
+    // FIXME: arbitary values hardcoded
+    ctx.fillText(`${this.number}`, this.x, this.y);
+  }
+}
+
+class SnakeBooster {
+  constructor() {
+    this.resetFood();
+  }
+
+  resetFood() {
+    this.foods = [];
+    for (var i = 0; i < 7; i++) {
+      let food = new SnakeFood(0, 0, 25, 25, "rgb(0,0,0)", 0);
+      food.reset();
+      this.foods.push(food);
+    }
+  }
+
+  draw() {
+    this.foods.forEach((food) => {
+      food.draw();
+    });
+  }
+
+  drop() {
+    this.foods.forEach((food) => {
+      food.drop();
+    });
+  }
+
+  checkConsumedFood() {
+    this.foods.forEach((food) => {
+      let collision = food.collisionWithCircle(snakeObj.snakeCircles[0]);
+      if (collision != COLLISION_TYPE.NO_COLLISION) {
+        while (food.number > 0) {
+          snakeObj.addCircle();
+          food.number--;
+        }
+        food.reset();
+      }
+    });
   }
 }
 
@@ -319,6 +424,12 @@ class Blocks {
     this.pipesBlockObj.dropSpeed *= -1;
     this.pipesBlockObj.drop();
     this.pipesBlockObj.dropSpeed *= -1;
+
+    snakeBoostersObj.foods.forEach((food) => {
+      food.dropSpeed *= -1;
+      food.drop();
+      food.dropSpeed *= -1;
+    });
   }
 
   collision(snake) {
@@ -366,7 +477,7 @@ class Blocks {
         // freeze everything in screen
         this.freeze();
         // reduce snake size
-        snakeObj.snakeCircles.shift(1);
+        snakeObj.snakeCircles.pop();
         // reduce block number
         hurdle.number -= 1;
         if (hurdle.number < 0) {
@@ -390,7 +501,7 @@ class Blocks {
         // freeze everything in screen
         this.freeze();
         // reduce snake size
-        snakeObj.snakeCircles.shift(1);
+        snakeObj.snakeCircles.pop();
         // reduce block number
         hurdle.number -= 1;
         if (hurdle.number < 1) {
@@ -403,16 +514,20 @@ class Blocks {
 }
 
 blocks = new Blocks();
+snakeBoostersObj = new SnakeBooster();
 
 function showBlock() {
+  snakeBoostersObj.draw();
   blocks.draw();
 }
 
 function moveBlock() {
   blocks.drop();
   blocks.handleOutofWindow();
+  snakeBoostersObj.drop();
 }
 
 function handleCollision(snake) {
+  snakeBoostersObj.checkConsumedFood(snake);
   blocks.collision(snake);
 }

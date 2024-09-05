@@ -59,9 +59,15 @@ class Snake {
 
   addCircle() {
     const snakeLength = this.snakeCircles.length;
+    let xCord;
+    if (this.snakeCircles.length < 1) {
+      xCord = WINDOW_SIZE / 2;
+    } else {
+      xCord = this.snakeCircles[this.snakeCircles.length - 1].x;
+    }
     this.snakeCircles.push(
       new Circle(
-        WINDOW_SIZE / 2,
+        xCord,
         this.startPoint + 2 * snakeLength * this.circleRadius,
         this.circleRadius,
         this.snakeColor
