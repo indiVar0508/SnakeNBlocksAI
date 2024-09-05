@@ -82,15 +82,15 @@ class Snake {
   }
 }
 
-let snake = new Snake();
+let snakeObj = new Snake();
 
 function moveSnake(evt) {
   var rect = canvas.getBoundingClientRect();
   // ref: https://stackoverflow.com/questions/17130395/real-mouse-position-in-canvas
-  snake.move((canvasObj.width / rect.width) * (evt.clientX - rect.left));
+  snakeObj.move((canvasObj.width / rect.width) * (evt.clientX - rect.left));
 }
 
 function showSnake() {
   // FIXME: something missing here snake gets stuck sometimes :/!?
-  snake.drawSnake();
+  snakeObj.drawSnake();
 }

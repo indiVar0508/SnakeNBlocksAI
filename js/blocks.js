@@ -92,16 +92,16 @@ class HurdleBlocks {
     }
     let numbers = [
       // Intentionally add most of the length to ensure not having multiple solutions
-      Math.floor(Math.random() * snake.snakeCircles.length * 5) +
-        (snake.snakeCircles.length - 2),
-      Math.floor(Math.random() * snake.snakeCircles.length * 5) +
-        (snake.snakeCircles.length - 2),
-      Math.floor(Math.random() * snake.snakeCircles.length * 5) +
-        (snake.snakeCircles.length - 2),
-      Math.floor(Math.random() * snake.snakeCircles.length * 5) +
-        (snake.snakeCircles.length - 2),
-      Math.floor(Math.random() * snake.snakeCircles.length * 5) +
-        (snake.snakeCircles.length - 2),
+      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
+        (snakeObj.snakeCircles.length - 2),
+      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
+        (snakeObj.snakeCircles.length - 2),
+      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
+        (snakeObj.snakeCircles.length - 2),
+      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
+        (snakeObj.snakeCircles.length - 2),
+      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
+        (snakeObj.snakeCircles.length - 2),
     ];
     let randomSolvableIdx = Math.floor(Math.random() * 5);
     let number;
@@ -110,7 +110,7 @@ class HurdleBlocks {
         // For solution block get a value less than snake length
         number = Math.max(
           0,
-          Math.floor(Math.random() * snake.snakeCircles.length - 1)
+          Math.floor(Math.random() * snakeObj.snakeCircles.length - 1)
         );
       } else {
         number = numbers[i];
@@ -209,8 +209,8 @@ class RandomHurdle extends HurdleBlocks {
     // 30% change of being created
     if (Math.random() > 0.3) return;
     let number =
-      Math.floor(Math.random() * snake.snakeCircles.length * 5) +
-      (snake.snakeCircles.length - 2);
+      Math.floor(Math.random() * snakeObj.snakeCircles.length * 5) +
+      (snakeObj.snakeCircles.length - 2);
     this.addHurdle(
       // Random X cordinate
       (Math.floor(Math.random() * 5) * WINDOW_SIZE) / 5,
@@ -309,14 +309,14 @@ class Blocks {
       }
       if (collision === COLLISION_TYPE.LEFT) {
         // Handle Left direction
-        snake.snakeCircles[0].x = pipe.x + pipe.width + snakeHead.radius;
+        snakeObj.snakeCircles[0].x = pipe.x + pipe.width + snakeHead.radius;
       } else if (collision === COLLISION_TYPE.RIGHT) {
         // Handle Right direction
-        snake.snakeCircles[0].x = pipe.x - snakeHead.radius;
+        snakeObj.snakeCircles[0].x = pipe.x - snakeHead.radius;
       } else if (collision === COLLISION_TYPE.BOTTOM) {
         // push to left!?!
         // FIXME: so this does not work :(
-        snake.snakeCircles[0].x = pipe.x - snakeHead.radius;
+        snakeObj.snakeCircles[0].x = pipe.x - snakeHead.radius;
       }
     });
     // restrict snake when it hits number block
@@ -335,15 +335,15 @@ class Blocks {
       let collision = hurdle.collisionWithCircle(snakeHead);
       if (collision === COLLISION_TYPE.LEFT) {
         // Handle Left direction
-        snake.snakeCircles[0].x = hurdle.x + hurdle.width + snakeHead.radius;
+        snakeObj.snakeCircles[0].x = hurdle.x + hurdle.width + snakeHead.radius;
       } else if (collision === COLLISION_TYPE.RIGHT) {
         // Handle Right direction
-        snake.snakeCircles[0].x = hurdle.x - snakeHead.radius;
+        snakeObj.snakeCircles[0].x = hurdle.x - snakeHead.radius;
       } else if (collision === COLLISION_TYPE.BOTTOM) {
         // freeze everything in screen
         this.freeze();
         // reduce snake size
-        // snake.snakeCircles.shift(1);
+        // snakeObj.snakeCircles.shift(1);
         // reduce block number
         hurdle.number -= 1;
         if (hurdle.number < 0) {
@@ -359,15 +359,15 @@ class Blocks {
       let collision = hurdle.collisionWithCircle(snakeHead);
       if (collision === COLLISION_TYPE.LEFT) {
         // Handle Left direction
-        snake.snakeCircles[0].x = hurdle.x + hurdle.width + snakeHead.radius;
+        snakeObj.snakeCircles[0].x = hurdle.x + hurdle.width + snakeHead.radius;
       } else if (collision === COLLISION_TYPE.RIGHT) {
         // Handle Right direction
-        snake.snakeCircles[0].x = hurdle.x - snakeHead.radius;
+        snakeObj.snakeCircles[0].x = hurdle.x - snakeHead.radius;
       } else if (collision === COLLISION_TYPE.BOTTOM) {
         // freeze everything in screen
         this.freeze();
         // reduce snake size
-        // snake.snakeCircles.shift(1);
+        // snakeObj.snakeCircles.shift(1);
         // reduce block number
         hurdle.number -= 1;
         if (hurdle.number < 1) {
