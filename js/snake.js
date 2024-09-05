@@ -43,7 +43,6 @@ class Snake {
     this.size = size;
     this.startPoint = 450;
     this.circleRadius = 10;
-    this.isAlive = true;
     this.snakeCircles = [];
     this.colorCode = 160;
     this.snakeColor = `rgb(${this.colorCode}, ${this.colorCode}, ${this.colorCode})`;
@@ -52,6 +51,10 @@ class Snake {
       this.addCircle();
       i += 1;
     }
+  }
+
+  isAlive() {
+    return this.snakeCircles.length > 0;
   }
 
   addCircle() {

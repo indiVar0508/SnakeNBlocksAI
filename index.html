@@ -25,13 +25,20 @@
       window.addEventListener("mousemove", moveSnake, true);
       // canvasObj.addEventListener("mousemove", moveSnake, true);
       draw = function () {
+        // Render Logic
         ctx.clearRect(0, 0, canvasObj.width, canvasObj.height);
         showBlock();
         showSnake();
-
-
+        // Handle Movement
         moveBlock();
+        // Collision
         handleCollision(snakeObj);
+        // Is Game still on!?
+        if (!snakeObj.isAlive()) {
+          snakeObj = new Snake();
+          blocks.reset();
+        }
+        // something related to canvas
         requestAnimationFrame(draw);
       }
 

@@ -274,6 +274,12 @@ class Blocks {
     this.hurdleBlockObj.draw();
   }
 
+  reset() {
+    this.randomHurdleObj.hurdles = [];
+    this.hurdleBlockObj.resetHurdles();
+    this.pipesBlockObj.pipes = [];
+  }
+
   drop() {
     this.hurdleBlockObj.drop();
     this.pipesBlockObj.drop();
@@ -343,7 +349,7 @@ class Blocks {
         // freeze everything in screen
         this.freeze();
         // reduce snake size
-        // snakeObj.snakeCircles.shift(1);
+        snakeObj.snakeCircles.shift(1);
         // reduce block number
         hurdle.number -= 1;
         if (hurdle.number < 0) {
@@ -367,7 +373,7 @@ class Blocks {
         // freeze everything in screen
         this.freeze();
         // reduce snake size
-        // snakeObj.snakeCircles.shift(1);
+        snakeObj.snakeCircles.shift(1);
         // reduce block number
         hurdle.number -= 1;
         if (hurdle.number < 1) {
