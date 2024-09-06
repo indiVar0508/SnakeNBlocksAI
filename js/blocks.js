@@ -342,9 +342,11 @@ class SnakeBooster {
   }
 
   checkConsumedFood() {
+    var foodScore = 0;
     this.foods.forEach((food) => {
       let collision = food.collisionWithCircle(snakeObj.snakeCircles[0]);
       if (collision != COLLISION_TYPE.NO_COLLISION) {
+        foodScore += food.number;
         while (food.number > 0) {
           snakeObj.addCircle();
           food.number--;
@@ -352,6 +354,7 @@ class SnakeBooster {
         food.reset();
       }
     });
+    return foodScore;
   }
 }
 
@@ -462,7 +465,7 @@ class Blocks {
     //  - number decreases in block collinding
     //  - ??
     // if snake hits sidewise it gets restrickted
-
+    var score = 0;
     // Handle random block collision
     for (var i = 0; i < this.randomHurdleObj.hurdles.length; i++) {
       let hurdle = this.randomHurdleObj.hurdles[i];
@@ -480,6 +483,7 @@ class Blocks {
         snakeObj.snakeCircles.pop();
         // reduce block number
         hurdle.number -= 1;
+        score++;
         if (hurdle.number < 0) {
           // Remove the hurdle
           this.randomHurdleObj.hurdles.splice(i, 1);
@@ -504,12 +508,14 @@ class Blocks {
         snakeObj.snakeCircles.pop();
         // reduce block number
         hurdle.number -= 1;
+        score++;
         if (hurdle.number < 1) {
           // Remove the hurdle
           this.hurdleBlockObj.hurdles.splice(i, 1);
         }
       }
     }
+    return score;
   }
 }
 
@@ -529,5 +535,6 @@ function moveBlock() {
 
 function handleCollision(snake) {
   snakeBoostersObj.checkConsumedFood(snake);
-  blocks.collision(snake);
+  var score = blocks.collision(snake);
+  return score;
 }

@@ -9,18 +9,38 @@
         border: 1px solid black;
         margin-left: 25%;
       }
+
+      .game {
+        display: flex;
+      }
+
+      .game-metrics {
+        margin-left: 20px;
+      }
     </style>
     <script type="text/javascript" src="./js/snake.js"></script>
     <script type="text/javascript" src="./js/blocks.js"></script>
   </head>
   <body>
- 
-    <canvas id="canvas" width="550" height="600""></canvas>
-
+    <div class="game">
+      <canvas id="canvas" width="550" height="600""></canvas>
+      <div class="game-metrics">
+      <div><strong>Score</strong> : <span id="score">0</span>  </div>
+      <div><strong>Best Score</strong> : <span id="best_score">0</span>  </div>
+      <div><strong>Attempt Number</strong> : <span id="attempt_num">0</span>  </div>
+      <div><strong>Snake Size</strong> : <span id="snake_size">4</span>  </div> </div>
+  </div>
     <script>
 
       const canvasObj = document.getElementById("canvas");
+      const scoreObj = document.getElementById("score");
+      const bestScoreObj = document.getElementById("best_score");
+      const attemptNumObj = document.getElementById("attempt_num");
+      const snakeSizeObj = document.getElementById("snake_size");
       let ctx = canvasObj.getContext("2d");
+      let score = 0;
+      let bestScore = 0;
+      let attemptNumber = 1;
 
       window.addEventListener("mousemove", moveSnake, true);
       // canvasObj.addEventListener("mousemove", moveSnake, true);
@@ -32,12 +52,21 @@
         // Handle Movement
         moveBlock();
         // Collision
-        handleCollision(snakeObj);
+        score += handleCollision(snakeObj);
+        attemptNumObj.innerHTML = attemptNumber;
+        bestScoreObj.innerHTML = bestScore;
+        scoreObj.innerHTML = score;
+        snakeSizeObj.innerHTML = snakeObj.snakeCircles.length;
         // Is Game still on!?
         if (!snakeObj.isAlive()) {
+          attemptNumber++;
           snakeObj = new Snake();
           snakeBoostersObj.resetFood();
           blocks.reset();
+          if (score > bestScore) {
+            bestScore = score;
+          }
+          score = 0;
         }
         // something related to canvas
         requestAnimationFrame(draw);
