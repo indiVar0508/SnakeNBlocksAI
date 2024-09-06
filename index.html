@@ -7,7 +7,7 @@
     <style>
       canvas {
         border: 1px solid black;
-        margin-left: 25%;
+        margin-left: 2%;
       }
 
       .game {
@@ -29,18 +29,27 @@
       <div><strong>Best Score</strong> : <span id="best_score">0</span>  </div>
       <div><strong>Attempt Number</strong> : <span id="attempt_num">0</span>  </div>
       <div><strong>Snake Size</strong> : <span id="snake_size">4</span>  </div> </div>
+      <canvas id="canvas-black-white" width="550" height="600""></canvas>
   </div>
     <script>
 
       const canvasObj = document.getElementById("canvas");
+      canvasObj.willReadFrequently = true;
+      const canvasBlackNWhiteObj = document.getElementById("canvas-black-white");
       const scoreObj = document.getElementById("score");
       const bestScoreObj = document.getElementById("best_score");
       const attemptNumObj = document.getElementById("attempt_num");
       const snakeSizeObj = document.getElementById("snake_size");
       let ctx = canvasObj.getContext("2d");
+      let ctx2 = canvasBlackNWhiteObj.getContext("2d");
       let score = 0;
       let bestScore = 0;
       let attemptNumber = 1;
+
+      function rgbToGrayscaleWeighted(r, g, b) {
+        // Function by ChatGPT BaWa __/\__
+        return Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+      }
 
       window.addEventListener("mousemove", moveSnake, true);
       // canvasObj.addEventListener("mousemove", moveSnake, true);
@@ -68,6 +77,23 @@
           }
           score = 0;
         }
+        let image = ctx.getImageData(0,0,canvasObj.width, canvasObj.height);
+        let aiFrame = [];
+        for (let i = 0; i < image.data.length; i += 4) {
+            const r = image.data[i];
+            const g = image.data[i + 1];
+            const b = image.data[i + 2];
+
+            const gray = rgbToGrayscaleWeighted(r, g, b);
+
+            // Set grayscale value to R, G, and B channels
+            image.data[i] = gray;      // Red
+            image.data[i + 1] = gray;  // Green
+            image.data[i + 2] = gray;  // Blue
+            aiFrame.push(gray);
+            // Alpha channel remains unchanged
+        }
+        ctx2.putImageData(image, 0, 0);
         // something related to canvas
         requestAnimationFrame(draw);
       }
