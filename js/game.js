@@ -40,6 +40,8 @@ function startGame() {
     }
     let image = ctx.getImageData(0, 0, canvasObj.width, canvasObj.height);
     let aiFrame = [];
+    let row = [];
+    var rowCounter = 0;
     for (let i = 0; i < image.data.length; i += 4) {
       const r = image.data[i];
       const g = image.data[i + 1];
@@ -51,7 +53,13 @@ function startGame() {
       image.data[i] = gray; // Red
       image.data[i + 1] = gray; // Green
       image.data[i + 2] = gray; // Blue
-      aiFrame.push(gray);
+      row.push(gray / 255);
+      rowCounter++;
+      if (rowCounter == 550) {
+        aiFrame.push(row);
+        row = [];
+        rowCounter = 0;
+      }
       // Alpha channel remains unchanged
     }
     ctx2.putImageData(image, 0, 0);
