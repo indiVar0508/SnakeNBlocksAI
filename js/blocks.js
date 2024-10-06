@@ -86,9 +86,9 @@ class Hurdle extends Rectange {
   draw() {
     super.draw();
     ctx.fillStyle = "white";
-    ctx.font = "48px serif";
+    ctx.font = "16px serif";
     // FIXME: arbitary values hardcoded
-    ctx.fillText(`${this.number}`, this.x + 25, this.y + this.height / 2 + 10);
+    ctx.fillText(`${this.number}`, this.x + 20, this.y + this.height / 2 + 5);
   }
 }
 
@@ -309,7 +309,7 @@ class SnakeFood extends Rectange {
     ctx.fill();
 
     ctx.fillStyle = "black";
-    ctx.font = "20px serif";
+    ctx.font = "10px serif";
     // FIXME: arbitary values hardcoded
     ctx.fillText(`${this.number}`, this.x, this.y);
   }
@@ -323,7 +323,7 @@ class SnakeBooster {
   resetFood() {
     this.foods = [];
     for (var i = 0; i < 7; i++) {
-      let food = new SnakeFood(0, 0, 25, 25, "rgb(0,0,0)", 0);
+      let food = new SnakeFood(0, 0, 10, 10, "rgb(0,0,0)", 0);
       food.reset();
       this.foods.push(food);
     }

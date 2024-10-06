@@ -1,4 +1,4 @@
-const WINDOW_SIZE = 550;
+const WINDOW_SIZE = 250;
 
 class Circle {
   constructor(x, y, radius, color) {
@@ -42,8 +42,8 @@ class Circle {
 class Snake {
   constructor(size = 4) {
     this.size = size;
-    this.startPoint = 450;
-    this.circleRadius = 10;
+    this.startPoint = WINDOW_SIZE - 20;
+    this.circleRadius = 5;
     this.snakeCircles = [];
     this.colorCode = 160;
     this.snakeColor = `rgb(${this.colorCode}, ${this.colorCode}, ${this.colorCode})`;
