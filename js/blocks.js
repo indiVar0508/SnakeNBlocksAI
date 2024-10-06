@@ -1,4 +1,4 @@
-const DROP_SPEED = 5;
+const DROP_SPEED = 3;
 const COLLISION_TYPE = Object.freeze({
   BOTTOM: 0,
   LEFT: 1,

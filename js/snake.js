@@ -29,6 +29,12 @@ class Circle {
     }
 
     this.speed = Math.floor((x - this.x) / 5);
+    if (this.speed > 5) {
+      this.speed = 5
+    } else if (this.speed < -5) {
+      this.speed = -5
+      
+    }
     this.x += this.speed;
   }
 }
