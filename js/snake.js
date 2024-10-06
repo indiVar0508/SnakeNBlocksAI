@@ -21,20 +21,15 @@ class Circle {
     if (!x) {
       return;
     }
-    var direction;
 
     if (x - this.radius <= 0) {
       x = this.radius;
     } else if (x + this.radius >= WINDOW_SIZE) {
       x = WINDOW_SIZE - this.radius;
     }
-    if (x < this.x) {
-      direction = -1;
-    } else {
-      direction = 1;
-    }
-    this.speed = 5; // Math.floor((x - this.x) / 5);
-    this.x += direction * this.speed;
+
+    this.speed = Math.floor((x - this.x) / 5);
+    this.x += this.speed;
   }
 }
 
