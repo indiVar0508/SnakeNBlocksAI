@@ -17,15 +17,18 @@ class Circle {
     ctx.fill();
   }
 
+  adjustX() {
+    
+    if (this.x - this.radius <= 0) {
+      this.x = this.radius;
+    } else if (this.x + this.radius >= WINDOW_SIZE) {
+      this.x = WINDOW_SIZE - this.radius;
+    }
+  }
+
   moveX(x) {
     if (!x) {
       return;
-    }
-
-    if (x - this.radius <= 0) {
-      x = this.radius;
-    } else if (x + this.radius >= WINDOW_SIZE) {
-      x = WINDOW_SIZE - this.radius;
     }
 
     this.speed = Math.floor((x - this.x) / 5);
@@ -36,6 +39,7 @@ class Circle {
       
     }
     this.x += this.speed;
+    this.adjustX()
   }
 }
 
@@ -89,6 +93,13 @@ class Snake {
     }
     // now move the head
     this.snakeCircles[0].moveX(x);
+  }
+
+  moveLeft() {
+    this.move(this.snakeCircles[0].x - 5);
+  }
+  moveRight() {
+    this.move(this.snakeCircles[0].x + 5);
   }
 }
 

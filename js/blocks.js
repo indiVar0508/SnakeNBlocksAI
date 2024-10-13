@@ -346,7 +346,7 @@ class SnakeBooster {
     this.foods.forEach((food) => {
       let collision = food.collisionWithCircle(snakeObj.snakeCircles[0]);
       if (collision != COLLISION_TYPE.NO_COLLISION) {
-        foodScore += food.number;
+        foodScore += food.number * 10;
         while (food.number > 0) {
           snakeObj.addCircle();
           food.number--;
@@ -534,7 +534,7 @@ function moveBlock() {
 }
 
 function handleCollision(snake) {
-  snakeBoostersObj.checkConsumedFood(snake);
-  var score = blocks.collision(snake);
-  return score;
+  var score = snakeBoostersObj.checkConsumedFood(snake);
+  var score2 = blocks.collision(snake);
+  return score + score2;
 }

@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+
     <title>Snake and Blocks</title>
     <style>
       canvas {
@@ -12,6 +14,11 @@
 
       .game {
         display: flex;
+        align-items: flex-start;
+      }
+
+      .ai-details {
+        padding: 50px;
       }
 
       .game-metrics {
@@ -21,6 +28,7 @@
     <script type="text/javascript" src="./js/snake.js"></script>
     <script type="text/javascript" src="./js/blocks.js"></script>
     <script type="text/javascript" src="./js/game.js"></script>
+    <script src="./js/dqn.js"></script>
   </head>
   <body>
     <div class="game">
@@ -31,14 +39,38 @@
       <div><strong>Attempt Number</strong> : <span id="attempt_num">0</span>  </div>
       <div><strong>Snake Size</strong> : <span id="snake_size">4</span>  </div> </div>
       <canvas id="canvas-black-white" width="250" height="300"></canvas>
+      <span id="ai-details">
+      <h5> Input to AI Model</h5>
+      <canvas id="canvas-black-white-smaller" width="125" height="150"></canvas>
+      <!-- <button onclick="showModel()">show model details</button>
+      <span id="model-details"></span> -->
+    </span>
   </div>
     <script>
+      // function showModel() {
+      //   function setOutput(text) {
+      //   document.getElementById("model-details").innerHTML=text
+      // }
+      // agent.model.summary(printFn=showModel);
+        
+      // }
     const canvasObj = document.getElementById("canvas");
     canvasObj.willReadFrequently = true;
     const canvasBlackNWhiteObj = document.getElementById("canvas-black-white");
+    const canvasBlackNWhiteObj3 = document.getElementById("canvas-black-white-smaller");
     let ctx = canvasObj.getContext("2d");
     let ctx2 = canvasBlackNWhiteObj.getContext("2d");
+    let ctx3 = canvasBlackNWhiteObj3.getContext("2d");
+    
+  let agent = new DQNAgent(null, 2)
+    
+  var aiWidth = 125,
+    aiHeight = 150,
+    buffer = new Uint8ClampedArray(aiWidth * aiHeight * 4); // have enough bytes
+    
+  let idata = ctx3.createImageData(125, 150);
     startGame();
     </script>
   </body>
 </html>
+    
